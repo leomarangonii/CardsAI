@@ -1,0 +1,48 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow read: if owns(uid);
+      allow create: if owns(uid);
+      allow update: if owns(uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          "xpTotal",
+          "currentStreak",
+          "longestStreak",
+          "lastStudyDate",
+          "lastStudyLocalDate",
+          "totalCardsStudied",
+          "totalDecksCompleted"
+        ]);
+      allow delete: if false;
+
+      match /studyTexts/{textId} {
+        allow read: if owns(uid);
+        allow write: if false;
+      }
+
+      match /languageDecks/{targetLang} {
+        allow read: if owns(uid);
+        allow write: if false;
+
+        match /cards/{cardId} {
+          allow read: if owns(uid);
+          allow write: if false;
+        }
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
