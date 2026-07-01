@@ -44,6 +44,7 @@ const callableOptions = {
     /^http:\/\/127\.0\.0\.1:\d+$/,
     "https://cardsai-dev.web.app",
     "https://cardsai-dev.firebaseapp.com",
+    "https://cards-ai-dev--cardsai-dev.us-east4.hosted.app",
   ],
 };
 
